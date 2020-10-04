@@ -9,11 +9,12 @@ const error = chalk.bold.yellow;
 const disconnected = chalk.bold.red;
 const termination = chalk.bold.magenta;
 
-module.exports = () => {
-  mongoose.connect(dbURL, { useNewUrlParser: true });
+module.exports = (worker) => {
+  mongoose.connect(dbURL, { useNewUrlParser: true, useUnifiedTopology: true });
 
   mongoose.connection.on("connected", () => {
     console.log(connected(`Mongoose default connection is open to: ${dbURL}`));
+    worker.start();
   });
 
   mongoose.connection.on("error", (err) => {
@@ -22,6 +23,7 @@ module.exports = () => {
 
   mongoose.connection.on("disconnected", () => {
     console.log(disconnected("Mongoose default connection is disconnected"));
+    worker.stop();
   });
 
   process.on("SIGINT", () => {
@@ -31,6 +33,7 @@ module.exports = () => {
           "Mongoose default connection is disconnected due to application termination"
         )
       );
+      worker.stop();
       process.exit(0);
     });
   });
