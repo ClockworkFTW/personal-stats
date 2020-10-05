@@ -14,7 +14,17 @@ const getCheckins = async () => {
 
     const result = await axios.get(url, config);
 
-    return result.data.response.checkins;
+    const checkins = result.data.response.checkins.items.map((checkin) => {
+      const date = new Date(checkin.createdAt * 1000);
+      let { name, location, categories } = checkin.venue;
+      categories = categories.map((category) => category.name);
+      const address = location.formattedAddress.join(", ");
+      const { lat, lng } = location;
+
+      return { date, name, lat, lng, address, categories };
+    });
+
+    return checkins;
   } catch (error) {
     return null;
   }

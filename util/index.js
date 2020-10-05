@@ -1,7 +1,7 @@
 const moment = require("moment");
 
 const wasYesterday = (time) => {
-  const day = moment().subtract(2, "days").startOf("day");
+  const day = moment().subtract(1, "days").startOf("day");
   return day.isSame(time, "day");
 };
 

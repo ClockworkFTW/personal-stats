@@ -1,16 +1,16 @@
 const mongoose = require("mongoose");
 
 const dietSchema = new mongoose.Schema({
-  calories: String,
-  carbs: String,
-  fat: String,
-  protein: String,
-  cholesterol: String,
-  sodium: String,
-  sugar: String,
-  fiber: String,
+  calories: Number,
+  carbs: Number,
+  fat: Number,
+  protein: Number,
+  cholesterol: Number,
+  sodium: Number,
+  sugar: Number,
+  fiber: Number,
   date: Date,
-  water: String,
+  water: Number,
 });
 
 const Diet = mongoose.model("Diet", dietSchema);

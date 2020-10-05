@@ -23,9 +23,7 @@ const tasks = async () => {
     pending("TASKS STARTED:", moment().format("h:mm:ssA YYYY-MM-DD"))
   );
 
-  const now = new Date();
-
-  // await mfp(now);
+  // await mfp();
   // await todoist();
   // await rescuetime();
   // await foursquare();
