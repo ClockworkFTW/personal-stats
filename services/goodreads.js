@@ -2,8 +2,7 @@ const axios = require("axios");
 const pify = require("pify");
 const { parseString } = require("xml2js");
 
-const { isBetween, formatTime } = require("../util");
-
+const { wasYesterday, formatTime } = require("../util");
 const cors = process.env.CORS_PROXY;
 const base_url = "https://www.goodreads.com";
 const key = process.env.GOODREADS_KEY;
@@ -79,7 +78,7 @@ const getBookProgress = async (book_id) => {
 
     progress = progress.filter((p) => {
       const isProgress = p.curr_page || p.curr_percent;
-      return isProgress && isBetween(p.created_at) ? true : false;
+      return isProgress && wasYesterday(p.created_at) ? true : false;
     });
 
     return progress.length > 0 ? progress[0] : null;

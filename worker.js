@@ -1,9 +1,13 @@
 const CronJob = require("cron").CronJob;
 const moment = require("moment");
 
+// Import chalk
+const { pending } = require("./config");
+
 // Import cron job tasks
 const mfp = require("./tasks/mfp");
 const todoist = require("./tasks/todoist");
+const rescuetime = require("./tasks/rescuetime");
 const foursquare = require("./tasks/foursquare");
 const github = require("./tasks/github");
 const goodreads = require("./tasks/goodreads");
@@ -15,18 +19,23 @@ const timezone = "America/Los_Angeles";
 
 // Execute cron job tasks
 const tasks = async () => {
-  console.log("TASKS STARTED:", moment().format("h:mm:ssA YYYY-MM-DD"));
+  console.log(
+    pending("TASKS STARTED:", moment().format("h:mm:ssA YYYY-MM-DD"))
+  );
 
-  // await mfp("2020-09-21");
+  const now = new Date();
+
+  // await mfp(now);
   // await todoist();
+  // await rescuetime();
   // await foursquare();
   // await github();
   // await goodreads();
   // await lastfm();
 
-  console.log("TASKS COMPLETED:", moment().format("h:mm:ssA YYYY-MM-DD"));
+  console.log(
+    pending("TASKS COMPLETED:", moment().format("h:mm:ssA YYYY-MM-DD"))
+  );
 };
-
-goodreads();
 
 module.exports = new CronJob(interval, tasks, null, true, timezone);

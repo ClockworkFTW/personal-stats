@@ -1,7 +1,6 @@
 const axios = require("axios");
 
-const { isBetween } = require("../util");
-
+const { wasYesterday } = require("../util");
 const cors = process.env.CORS_PROXY;
 const base_url = "http://ws.audioscrobbler.com/2.0/";
 const api_key = process.env.LASTFM_API_KEY;
@@ -27,7 +26,7 @@ const getTracks = async () => {
         tracks = [...tracks, ...result];
 
         result.forEach((track) => {
-          if (track.date && !isBetween(track.date.uts * 1000)) {
+          if (track.date && !wasYesterday(track.date.uts * 1000)) {
             next = false;
           }
         });
@@ -39,7 +38,7 @@ const getTracks = async () => {
     }
 
     tracks = tracks.filter(
-      (track) => track.date && isBetween(track.date.uts * 1000)
+      (track) => track.date && wasYesterday(track.date.uts * 1000)
     );
 
     return tracks;

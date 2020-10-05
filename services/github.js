@@ -1,7 +1,6 @@
 const axios = require("axios");
 
-const { isBetween } = require("../util");
-
+const { wasYesterday } = require("../util");
 const cors = process.env.CORS_PROXY;
 const base_url = "https://api.github.com";
 
@@ -22,7 +21,7 @@ const getCommits = async () => {
       commits = [...commits, ...result.data];
 
       result.data.forEach((commit) => {
-        if (!isBetween(commit.created_at)) {
+        if (!wasYesterday(commit.created_at)) {
           next = false;
         }
       });
@@ -30,7 +29,7 @@ const getCommits = async () => {
       page++;
     }
 
-    commits = commits.filter((event) => isBetween(event.created_at));
+    commits = commits.filter((event) => wasYesterday(event.created_at));
 
     return commits;
   } catch (error) {

@@ -1,9 +1,8 @@
 const moment = require("moment");
 
-const isBetween = (time) => {
-  const start = moment().subtract(1, "days").startOf("day");
-  const end = moment().subtract(1, "days").endOf("day");
-  return moment(time).local().isBetween(start, end);
+const wasYesterday = (time) => {
+  const day = moment().subtract(2, "days").startOf("day");
+  return day.isSame(time, "day");
 };
 
 const formatTime = (time) => {
@@ -12,4 +11,4 @@ const formatTime = (time) => {
   return new Date(fTime);
 };
 
-module.exports = { isBetween, formatTime };
+module.exports = { wasYesterday, formatTime };
