@@ -2,14 +2,18 @@ const googlesheets = require("../services/googlesheets");
 const { pass, fail } = require("../config");
 const { wasYesterday } = require("../util");
 const Todo = require("../models/todo");
-const id = process.env.TODOIST_ID;
+const id_personal = process.env.TODOIST_ID_PERSONAL;
+const id_work = process.env.TODOIST_ID_WORK;
 
 module.exports = async () => {
   try {
-    const data = await googlesheets.getData(id);
+    const personal = await googlesheets.getData(id_personal);
+    const work = await googlesheets.getData(id_work);
+
+    const todos = [...personal, ...work];
 
     await Promise.all(
-      data.map(async (todo) => {
+      todos.map(async (todo) => {
         const date = new Date(todo.date.split(" ").slice(0, 3).join(" "));
 
         if (wasYesterday(date)) {
