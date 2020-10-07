@@ -1,6 +1,14 @@
 const lastfm = require("../services/lastfm");
+const Track = require("../models/track");
+const { pass, fail } = require("../config");
 
 module.exports = async () => {
-  const data = await lastfm.getTracks();
-  console.log(data);
+  try {
+    const tracks = await lastfm.getTracks();
+    await Track.insertMany(tracks);
+
+    console.log(pass("PASSED - MFP"));
+  } catch (error) {
+    console.log(fail("FAILED - MFP"));
+  }
 };
