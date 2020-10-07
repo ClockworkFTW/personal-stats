@@ -7,7 +7,6 @@ const Activity = require("../models/activity");
 router.post("/", async (req, res) => {
   try {
     const { data } = req.body;
-    console.log(data);
 
     await Promise.all(
       data.map(async (activity) => {
@@ -19,10 +18,10 @@ router.post("/", async (req, res) => {
       })
     );
 
-    res.status(200).end();
+    res.status(200).send("SUCCESS");
   } catch (error) {
     console.log(error);
-    res.status(400).end();
+    res.status(400).send("ERROR");
   }
 });
 
