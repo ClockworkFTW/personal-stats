@@ -7,8 +7,8 @@ module.exports = async () => {
     const tracks = await lastfm.getTracks();
     await Track.insertMany(tracks);
 
-    console.log(pass("PASSED - MFP"));
+    console.log(pass("PASSED - LASTFM"));
   } catch (error) {
-    console.log(fail("FAILED - MFP"));
+    console.log(fail("FAILED - LASTFM"));
   }
 };

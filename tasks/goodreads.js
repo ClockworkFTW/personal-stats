@@ -1,5 +1,5 @@
 const goodreads = require("../services/goodreads");
-const Book = require("../models/books");
+const Book = require("../models/book");
 const { pass, fail } = require("../config");
 
 module.exports = async () => {

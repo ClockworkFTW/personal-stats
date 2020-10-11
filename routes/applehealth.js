@@ -8,15 +8,17 @@ router.post("/", async (req, res) => {
   try {
     const { data } = req.body;
 
-    await Promise.all(
-      data.map(async (activity) => {
-        const date = new Date(activity.date);
+    console.log(data);
 
-        if (wasYesterday(date)) {
-          await Activity.create({ ...activity, date });
-        }
-      })
-    );
+    // await Promise.all(
+    //   data.map(async (activity) => {
+    //     const date = new Date(activity.date);
+
+    //     if (wasYesterday(date)) {
+    //       await Activity.create({ ...activity, date });
+    //     }
+    //   })
+    // );
 
     res.status(200).send("SUCCESS");
   } catch (error) {

@@ -11,4 +11,29 @@ const formatTime = (time) => {
   return new Date(fTime);
 };
 
-module.exports = { wasYesterday, formatTime };
+const setDateLimit = ({ from, to }) => {
+  let range = {};
+
+  if (from && to) {
+    range = { $gte: from, $lte: to };
+  }
+  if (from && !to) {
+    range = { $gte: from };
+  }
+  if (!from && to) {
+    range = { $lte: to };
+  }
+  if (from === to) {
+    range = {
+      $gte: moment(from).startOf("day").toDate(),
+      $lte: moment(to).endOf("day").toDate(),
+    };
+  }
+  if (!from && !to) {
+    return {};
+  }
+
+  return { date: range };
+};
+
+module.exports = { wasYesterday, formatTime, setDateLimit };

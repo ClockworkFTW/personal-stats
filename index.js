@@ -1,9 +1,11 @@
 const express = require("express");
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3005;
 
 require("dotenv").config();
 
+const cors = require("cors");
+app.use(cors());
 app.use(express.json());
 
 // Start worker once db connection has been established

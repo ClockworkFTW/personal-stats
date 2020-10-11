@@ -36,7 +36,7 @@ const getTracks = async () => {
           return date ? { artist, album, date, name, url } : null;
         });
 
-        // Filter out "now plaging" track if it exists
+        // Filter out "now playing" track if it exists
         result = result.filter((track) => track);
 
         // Append formatted result array to tracks array
