@@ -11,11 +11,10 @@ router.post("/", async (req, res) => {
     await Promise.all(
       data.map(async (activity) => {
         const date = new Date(activity.date);
-        await Activity.create({ ...activity, date });
 
-        // if (wasYesterday(date)) {
-        //   await Activity.create({ ...activity, date });
-        // }
+        if (wasYesterday(date)) {
+          await Activity.create({ ...activity, date });
+        }
       })
     );
 

@@ -4,8 +4,8 @@ const { pass, fail } = require("../config");
 
 module.exports = async () => {
   try {
-    // Get books in "currently reading" shelf
-    let books = await goodreads.getCurrentlyReading();
+    // Get books in "currently reading" and "read" shelf
+    let books = await goodreads.getBooks();
 
     // Add progress updates
     books = await Promise.all(
@@ -27,9 +27,8 @@ module.exports = async () => {
       })
     );
 
-    // Remove books without progress updates
+    // Remove books without progress updates and add to database
     books = books.filter((book) => book);
-
     await Book.insertMany(books);
 
     console.log(pass("PASSED - GOODREADS"));

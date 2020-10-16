@@ -5,6 +5,7 @@ const { setDateLimit } = require("../util");
 
 const Activity = require("../models/activity");
 const Book = require("../models/book");
+const Commit = require("../models/commit");
 const Diet = require("../models/diet");
 const Place = require("../models/place");
 const Time = require("../models/time");
@@ -15,6 +16,7 @@ const Workout = require("../models/workout");
 router.get("/", async (req, res) => {
   try {
     const activities = await Activity.find(setDateLimit(req.query));
+    const commits = await Commit.find(setDateLimit(req.query));
     const books = await Book.find(setDateLimit(req.query));
     const diet = await Diet.find(setDateLimit(req.query));
     const places = await Place.find(setDateLimit(req.query));
@@ -24,7 +26,7 @@ router.get("/", async (req, res) => {
     const workouts = await Workout.find(setDateLimit(req.query));
 
     // prettier-ignore
-    let data = { activities, books, diet, places, time, todos, tracks, workouts }
+    let data = { activities, books, commits, diet, places, time, todos, tracks, workouts }
     const types = req.query.type ? req.query.type.split(",") : null;
 
     if (types) {

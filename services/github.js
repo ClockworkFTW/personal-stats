@@ -31,6 +31,13 @@ const getCommits = async () => {
 
     commits = commits.filter((event) => wasYesterday(event.created_at));
 
+    commits = commits.map((commit) => {
+      const { type } = commit;
+      const repo = commit.repo.name.split("/")[1];
+      const date = new Date(commit.created_at);
+      return { type, repo, date };
+    });
+
     return commits;
   } catch (error) {
     return null;

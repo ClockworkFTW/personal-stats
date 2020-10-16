@@ -10,12 +10,12 @@ const user_id = process.env.GOODREADS_USER_ID;
 
 const config = { headers: { Origin: "x-requested-with" } };
 
-const getCurrentlyReading = async () => {
+const getBooks = async () => {
   try {
     const endpoint = "review/list?v=2";
     const shelf = "currently-reading";
 
-    const url = `${cors}/${base_url}/${endpoint}&key=${key}&id=${user_id}&shelf=${shelf}`;
+    const url = `${cors}/${base_url}/${endpoint}&key=${key}&id=${user_id}`;
 
     const result = await axios.get(url, config);
     const data = await pify(parseString)(result.data);
@@ -45,46 +45,62 @@ const getBookProgress = async (book_id) => {
 
     const url = `${cors}/${base_url}/${endpoint}&key=${key}&user_id=${user_id}&book_id=${book_id}`;
 
+    // Fetch book reviews and parse XML to JSON
     const result = await axios.get(url, config);
     const data = await pify(parseString)(result.data);
-
     const review = data.GoodreadsResponse.review[0];
 
-    let initial = [];
+    // Extract date and apply page/percent progress based on status
+    let read_statuses = [];
 
     if (review.read_statuses) {
-      initial = review.read_statuses[0].read_status.map((e) => {
-        const curr_page = "0";
-        const curr_percent = "0";
-        const created_at = formatTime(e.updated_at[0]._);
-
-        return { curr_page, curr_percent, created_at };
+      read_statuses = review.read_statuses[0].read_status.map((e) => {
+        if (e.status[0] === "to-read") {
+          return null;
+        } else {
+          let curr_page, curr_percent, date;
+          if (e.status[0] === "currently-reading") {
+            curr_page = "0";
+            curr_percent = "0";
+            date = formatTime(e.updated_at[0]._);
+          } else {
+            curr_percent = "100";
+            date = formatTime(e.updated_at[0]._);
+          }
+          return { curr_page, curr_percent, date };
+        }
       });
     }
 
-    let updates = [];
+    read_statuses = read_statuses.filter((e) => e);
+
+    // Extract date, current page and percentage from user statuses
+    let user_statuses = [];
 
     if (review.user_statuses) {
-      updates = review.user_statuses[0].user_status.map((e) => {
+      user_statuses = review.user_statuses[0].user_status.map((e) => {
         const curr_page = e.page[0]._;
         const curr_percent = e.percent[0]._;
-        const created_at = formatTime(e.created_at[0]._);
+        const date = formatTime(e.created_at[0]._);
 
-        return { curr_page, curr_percent, created_at };
+        return { curr_page, curr_percent, date };
       });
     }
 
-    let progress = [...initial, ...updates];
+    // Combine statuses and filter out the most recent update from the previous day
+    let progress = [...read_statuses, ...user_statuses];
 
     progress = progress.filter((p) => {
       const isProgress = p.curr_page || p.curr_percent;
-      return isProgress && wasYesterday(p.created_at) ? true : false;
+      return isProgress && wasYesterday(p.date) ? true : false;
     });
 
-    return progress.length > 0 ? progress[0] : null;
+    progress = progress.sort((a, b) => b.date - a.date);
+
+    return progress[0] ? progress[0] : null;
   } catch (error) {
     return null;
   }
 };
 
-module.exports = { getCurrentlyReading, getBookProgress };
+module.exports = { getBooks, getBookProgress };
