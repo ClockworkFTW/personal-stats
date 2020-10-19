@@ -14,7 +14,7 @@ const goodreads = require("./tasks/goodreads");
 const lastfm = require("./tasks/lastfm");
 
 // Define cron job settings
-const interval = "* * * * *";
+const interval = "0 0 * * *";
 const timezone = "America/Los_Angeles";
 
 // Execute cron job tasks
@@ -23,13 +23,13 @@ const tasks = async () => {
     pending("TASKS STARTED:", moment().format("h:mm:ssA YYYY-MM-DD"))
   );
 
-  // await mfp();
-  // await todoist();
-  // await rescuetime();
-  // await foursquare();
-  // await github();
-  // await goodreads();
-  // await lastfm();
+  await mfp();
+  await todoist();
+  await rescuetime();
+  await foursquare();
+  await github();
+  await goodreads();
+  await lastfm();
 
   console.log(
     pending("TASKS COMPLETED:", moment().format("h:mm:ssA YYYY-MM-DD"))
