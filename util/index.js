@@ -36,4 +36,49 @@ const setDateLimit = ({ from, to }) => {
   return { date: range };
 };
 
-module.exports = { wasYesterday, formatTime, setDateLimit };
+const formatSleep = (activities) => {
+  const sleep = activities
+    .filter((e) => e.type === "Sleep")
+    .sort((a, b) => a.date - b.date);
+
+  let arr = [[]];
+  let chunk = 0;
+
+  sleep.forEach((e, i) => {
+    if (i === 0 || moment.utc(e.date).isSame(sleep[i - 1].date, "day")) {
+      arr[chunk] = [...arr[chunk], e];
+    } else {
+      chunk++;
+      arr[chunk] = [e];
+    }
+  });
+
+  const result = arr.map((day) => {
+    let duration = moment.duration();
+
+    day.forEach((e) => {
+      const arr = e.duration.split(":").reverse();
+      arr.forEach((x, i) => {
+        if (i === 0) {
+          duration = duration.add(moment.duration(x, "s"));
+        }
+        if (i === 1) {
+          duration = duration.add(moment.duration(x, "m"));
+        }
+        if (i === 2) {
+          duration = duration.add(moment.duration(x, "h"));
+        }
+      });
+    });
+
+    duration = duration.asHours().toFixed(1);
+
+    const date = new Date(moment.utc(day[0].date).startOf("day"));
+
+    return { type: "Sleep", date, duration, value: "", unit: "hours" };
+  });
+
+  return result;
+};
+
+module.exports = { wasYesterday, formatTime, setDateLimit, formatSleep };
