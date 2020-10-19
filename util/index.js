@@ -36,10 +36,15 @@ const setDateLimit = ({ from, to }) => {
   return { date: range };
 };
 
-const formatSleep = (activities) => {
-  const sleep = activities
-    .filter((e) => e.type === "Sleep")
-    .sort((a, b) => a.date - b.date);
+const formatActivities = (activities) => {
+  // prettier-ignore
+  const sleep = activities.filter((e) => e.type === "Sleep").sort((a, b) => a.date - b.date);
+  const rest = activities.filter((e) => e.type !== "Sleep");
+
+  // If there is no sleep data, return the activities array
+  if (sleep.length === 0) {
+    return rest;
+  }
 
   let arr = [[]];
   let chunk = 0;
@@ -53,7 +58,7 @@ const formatSleep = (activities) => {
     }
   });
 
-  const result = arr.map((day) => {
+  const formattedSleep = arr.map((day) => {
     let duration = moment.duration();
 
     day.forEach((e) => {
@@ -78,7 +83,7 @@ const formatSleep = (activities) => {
     return { type: "Sleep", date, duration, value: "", unit: "hours" };
   });
 
-  return result;
+  return [...rest, ...formattedSleep];
 };
 
-module.exports = { wasYesterday, formatTime, setDateLimit, formatSleep };
+module.exports = { wasYesterday, formatTime, setDateLimit, formatActivities };

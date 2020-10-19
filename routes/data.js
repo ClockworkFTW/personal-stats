@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { setDateLimit, formatSleep } = require("../util");
+const { setDateLimit, formatActivities } = require("../util");
 
 const Activity = require("../models/activity");
 const Book = require("../models/book");
@@ -16,9 +16,7 @@ const Workout = require("../models/workout");
 router.get("/", async (req, res) => {
   try {
     let activities = await Activity.find(setDateLimit(req.query));
-    const sleep = formatSleep(activities);
-    activities = activities.filter((e) => e.type !== "Sleep");
-    activities = [...activities, ...sleep];
+    activities = formatActivities(activities);
     const commits = await Commit.find(setDateLimit(req.query));
     const books = await Book.find(setDateLimit(req.query));
     const diet = await Diet.find(setDateLimit(req.query));

@@ -1,8 +1,7 @@
 const mongoose = require("mongoose");
 const chalk = require("chalk");
 
-const dbURL =
-  "mongodb+srv://clockworkftw:%23Trinity13@cluster0.9vvob.mongodb.net/personal_stats?retryWrites=true&w=majority";
+const dbURL = process.env.MONGODB_URL;
 
 const connected = chalk.bold.cyan;
 const error = chalk.bold.yellow;
