@@ -5,7 +5,7 @@ const { pass, fail } = require("../config");
 module.exports = async () => {
   try {
     const tracks = await lastfm.getTracks();
-    await Track.insertMany(tracks);
+    await Track.insertMany(tracks, { ordered: false });
 
     console.log(pass("PASSED - LASTFM"));
   } catch (error) {

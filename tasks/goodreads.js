@@ -1,3 +1,5 @@
+const hash = require("object-hash");
+
 const goodreads = require("../services/goodreads");
 const Book = require("../models/book");
 const { pass, fail } = require("../config");
@@ -10,26 +12,29 @@ module.exports = async () => {
     // Add progress updates
     books = await Promise.all(
       books.map(async (book) => {
-        const progress = await goodreads.getBookProgress(book.id);
+        let progress = await goodreads.getBookProgress(book.book_id);
 
-        if (progress) {
-          let { curr_page, curr_percent } = progress;
+        progress = progress.map((e) => {
+          const cur_page = e.cur_page
+            ? e.cur_page
+            : Math.floor((e.cur_percent / 100) * book.num_pages).toString();
+          const cur_percent = e.cur_percent
+            ? e.cur_percent
+            : (e.cur_page / book.num_pages).toString();
 
-          // prettier-ignore
-          curr_page = curr_page ? curr_page : Math.floor((curr_percent / 100) * book.num_pages).toString();
-          // prettier-ignore
-          curr_percent = curr_percent ? curr_percent : (curr_page / book.num_pages).toString();
+          const obj = { ...book, ...e, cur_page, cur_percent };
+          const uid = hash(obj);
 
-          return { ...book, ...progress, curr_page, curr_percent };
-        } else {
-          return null;
-        }
+          return { uid, ...obj };
+        });
+
+        return progress;
       })
     );
 
-    // Remove books without progress updates and add to database
-    books = books.filter((book) => book);
-    await Book.insertMany(books);
+    // Flatten books array and insert into DB
+    books = books.flat();
+    await Book.insertMany(books, { ordered: false });
 
     console.log(pass("PASSED - GOODREADS"));
   } catch (error) {

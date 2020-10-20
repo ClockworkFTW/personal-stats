@@ -1,12 +1,16 @@
 const mongoose = require("mongoose");
+const uniqueValidator = require("mongoose-unique-validator");
 
 const trackSchema = new mongoose.Schema({
-  artist: String,
-  album: String,
-  name: String,
-  url: String,
-  date: Date,
+  uid: { type: String, required: true, unique: true },
+  artist: { type: String, required: true },
+  album: { type: String, required: true },
+  name: { type: String, required: true },
+  url: { type: String, required: true },
+  date: { type: Date, required: true },
 });
+
+trackSchema.plugin(uniqueValidator);
 
 const Track = mongoose.model("Track", trackSchema);
 

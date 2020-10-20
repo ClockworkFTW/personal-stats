@@ -2,7 +2,7 @@ const axios = require("axios");
 const pify = require("pify");
 const { parseString } = require("xml2js");
 
-const { wasYesterday, formatTime } = require("../util");
+const { formatTime } = require("../util");
 const cors = process.env.CORS_PROXY;
 const base_url = "https://www.goodreads.com";
 const key = process.env.GOODREADS_KEY;
@@ -13,7 +13,6 @@ const config = { headers: { Origin: "x-requested-with" } };
 const getBooks = async () => {
   try {
     const endpoint = "review/list?v=2";
-    const shelf = "currently-reading";
 
     const url = `${cors}/${base_url}/${endpoint}&key=${key}&id=${user_id}`;
 
@@ -24,7 +23,7 @@ const getBooks = async () => {
       const { id, authors, title, num_pages } = review.book[0];
 
       const book = {
-        id: id[0]._,
+        book_id: id[0]._,
         title: title[0],
         author: authors.map(({ author }) => author[0].name[0])[0],
         num_pages: num_pages[0],
@@ -58,16 +57,16 @@ const getBookProgress = async (book_id) => {
         if (e.status[0] === "to-read") {
           return null;
         } else {
-          let curr_page, curr_percent, date;
+          let cur_page, cur_percent, date;
           if (e.status[0] === "currently-reading") {
-            curr_page = "0";
-            curr_percent = "0";
+            cur_page = "0";
+            cur_percent = "0";
             date = formatTime(e.updated_at[0]._);
           } else {
-            curr_percent = "100";
+            cur_percent = "100";
             date = formatTime(e.updated_at[0]._);
           }
-          return { curr_page, curr_percent, date };
+          return { cur_page, cur_percent, date };
         }
       });
     }
@@ -79,25 +78,16 @@ const getBookProgress = async (book_id) => {
 
     if (review.user_statuses) {
       user_statuses = review.user_statuses[0].user_status.map((e) => {
-        const curr_page = e.page[0]._;
-        const curr_percent = e.percent[0]._;
+        const cur_page = e.page[0]._;
+        const cur_percent = e.percent[0]._;
         const date = formatTime(e.created_at[0]._);
 
-        return { curr_page, curr_percent, date };
+        return { cur_page, cur_percent, date };
       });
     }
 
-    // Combine statuses and filter out the most recent update from the previous day
-    let progress = [...read_statuses, ...user_statuses];
-
-    progress = progress.filter((p) => {
-      const isProgress = p.curr_page || p.curr_percent;
-      return isProgress && wasYesterday(p.date) ? true : false;
-    });
-
-    progress = progress.sort((a, b) => b.date - a.date);
-
-    return progress[0] ? progress[0] : null;
+    // Combine status arrays and return
+    return [...read_statuses, ...user_statuses];
   } catch (error) {
     return null;
   }

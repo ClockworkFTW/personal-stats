@@ -4,8 +4,8 @@ const Commit = require("../models/commit");
 
 module.exports = async () => {
   try {
-    const commits = await github.getCommits();
-    await Commit.insertMany(commits);
+    const events = await github.getEvents();
+    await Commit.insertMany(events, { ordered: false });
 
     console.log(pass("PASSED - GITHUB"));
   } catch (error) {

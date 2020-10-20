@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
+const uniqueValidator = require("mongoose-unique-validator");
 
 const placeSchema = new mongoose.Schema({
+  uid: { type: String, unique: true },
   name: String,
   lat: Number,
   lng: Number,
@@ -8,6 +10,8 @@ const placeSchema = new mongoose.Schema({
   categories: [String],
   date: Date,
 });
+
+placeSchema.plugin(uniqueValidator);
 
 const Place = mongoose.model("Place", placeSchema);
 

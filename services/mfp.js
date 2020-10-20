@@ -1,5 +1,6 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
+const hash = require("object-hash");
 
 const cors = process.env.CORS_PROXY;
 const base_url = "https://www.myfitnesspal.com/reports/printable_diary";
@@ -39,7 +40,9 @@ const getNutrition = async (date) => {
     // add date to results object
     results.date = date;
 
-    return results;
+    const uid = hash(results);
+
+    return { uid, ...results };
   } catch (error) {
     return null;
   }
@@ -86,7 +89,10 @@ const getWorkouts = async (date) => {
       }
     }
 
-    return results;
+    return results.map((workout) => {
+      const uid = hash(workout);
+      return { uid, ...workout };
+    });
   } catch (error) {
     return null;
   }

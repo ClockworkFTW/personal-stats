@@ -13,7 +13,9 @@ module.exports = async () => {
     await Diet.create(nutrition);
 
     const workouts = await mfp.getWorkouts(date);
-    await Workout.insertMany(workouts);
+    await Workout.insertMany(workouts, { ordered: false });
+
+    console.log(nutrition, workouts);
 
     console.log(pass("PASSED - MFP"));
   } catch (error) {

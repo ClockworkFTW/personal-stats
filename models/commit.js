@@ -1,10 +1,14 @@
 const mongoose = require("mongoose");
+const uniqueValidator = require("mongoose-unique-validator");
 
 const commitSchema = new mongoose.Schema({
-  type: String,
-  repo: String,
-  date: Date,
+  uid: { type: String, required: true, unique: true },
+  type: { type: String, required: true },
+  repo: { type: String, required: true },
+  date: { type: Date, required: true },
 });
+
+commitSchema.plugin(uniqueValidator);
 
 const Commit = mongoose.model("Commit", commitSchema);
 

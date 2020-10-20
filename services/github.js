@@ -1,47 +1,41 @@
 const axios = require("axios");
+const hash = require("object-hash");
 
-const { wasYesterday } = require("../util");
 const cors = process.env.CORS_PROXY;
 const base_url = "https://api.github.com";
+const client_id = process.env.GITHUB_CLIENT_ID;
+const client_secret = process.env.GITHUB_CLIENT_SECRET;
 
 const config = { headers: { Origin: "x-requested-with" } };
 
-const getCommits = async () => {
+const getEvents = async () => {
   try {
     const endpoint = "users/clockworkftw/events";
-    const url = `${cors}/${base_url}/${endpoint}`;
+    const per_page = 100;
+    const url = `${cors}/${base_url}/${endpoint}?per_page=${per_page}`;
 
-    let next = true;
-    let commits = [];
-    let page = 1;
+    let events = [];
 
-    while (next) {
-      const result = await axios.get(`${url}?page=${page}`, config);
-
-      commits = [...commits, ...result.data];
-
-      result.data.forEach((commit) => {
-        if (!wasYesterday(commit.created_at)) {
-          next = false;
-        }
-      });
-
-      page++;
+    // Fetch last 500 events
+    for (let i = 1; i <= 3; i++) {
+      const result = await axios.get(`${url}&page=${i}`, config);
+      events = [...events, ...result.data];
     }
 
-    commits = commits.filter((event) => wasYesterday(event.created_at));
-
-    commits = commits.map((commit) => {
-      const { type } = commit;
-      const repo = commit.repo.name.split("/")[1];
-      const date = new Date(commit.created_at);
-      return { type, repo, date };
+    // Format events
+    events = events.map((event) => {
+      const { type } = event;
+      const repo = event.repo.name.split("/")[1];
+      const date = new Date(event.created_at);
+      const obj = { type, repo, date };
+      const uid = hash(obj);
+      return { uid, ...obj };
     });
 
-    return commits;
+    return events;
   } catch (error) {
     return null;
   }
 };
 
-module.exports = { getCommits };
+module.exports = { getEvents };

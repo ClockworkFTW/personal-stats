@@ -9,7 +9,11 @@ const disconnected = chalk.bold.red;
 const termination = chalk.bold.magenta;
 
 module.exports = (worker) => {
-  mongoose.connect(dbURL, { useNewUrlParser: true, useUnifiedTopology: true });
+  mongoose.connect(dbURL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+  });
 
   mongoose.connection.on("connected", () => {
     console.log(connected(`Mongoose default connection is open to: ${dbURL}`));

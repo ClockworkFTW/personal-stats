@@ -1,6 +1,7 @@
-const googlesheets = require("../services/googlesheets");
+const hash = require("object-hash");
+
 const { pass, fail } = require("../config");
-const { wasYesterday } = require("../util");
+const googlesheets = require("../services/googlesheets");
 const Todo = require("../models/todo");
 const id_personal = process.env.TODOIST_ID_PERSONAL;
 const id_work = process.env.TODOIST_ID_WORK;
@@ -10,17 +11,16 @@ module.exports = async () => {
     const personal = await googlesheets.getData(id_personal);
     const work = await googlesheets.getData(id_work);
 
-    const todos = [...personal, ...work];
+    let todos = [...personal, ...work];
 
-    await Promise.all(
-      todos.map(async (todo) => {
-        const date = new Date(todo.date.split(" ").slice(0, 3).join(" "));
+    todos = todos.map((todo) => {
+      const date = new Date(todo.date.split(" ").slice(0, 3).join(" "));
+      const obj = { ...todo, date };
+      const uid = hash(obj);
+      return { uid, ...obj };
+    });
 
-        if (wasYesterday(date)) {
-          await Todo.create({ ...todo, date });
-        }
-      })
-    );
+    Todo.insertMany(todos, { ordered: false });
 
     console.log(pass("PASSED - TODOIST"));
   } catch (error) {

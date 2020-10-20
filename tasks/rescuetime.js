@@ -1,22 +1,22 @@
+const hash = require("object-hash");
+
 const googlesheets = require("../services/googlesheets");
 const { pass, fail } = require("../config");
-const { wasYesterday } = require("../util");
 const Time = require("../models/time");
 const id = process.env.RESCUETIME_ID;
 
 module.exports = async () => {
   try {
-    const data = await googlesheets.getData(id);
+    let times = await googlesheets.getData(id);
 
-    await Promise.all(
-      data.map(async (time) => {
-        const date = new Date(time.date);
+    times = times.map((time) => {
+      const date = new Date(time.date);
+      const obj = { ...time, date };
+      const uid = hash(obj);
+      return { uid, ...obj };
+    });
 
-        if (wasYesterday(date)) {
-          await Time.create({ ...time, date });
-        }
-      })
-    );
+    Time.insertMany(times, { ordered: false });
 
     console.log(pass("PASSED - RESCUETIME"));
   } catch (error) {

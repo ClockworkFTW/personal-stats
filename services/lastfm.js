@@ -1,8 +1,8 @@
 const axios = require("axios");
 const pify = require("pify");
 const { parseString } = require("xml2js");
+const hash = require("object-hash");
 
-const { wasYesterday } = require("../util");
 const cors = process.env.CORS_PROXY;
 const base_url = "http://ws.audioscrobbler.com/2.0/";
 const api_key = process.env.LASTFM_API_KEY;
@@ -33,7 +33,13 @@ const getTracks = async () => {
           const name = track.name[0];
           const url = track.url[0];
           const date = track.date ? new Date(track.date[0].$.uts * 1000) : null;
-          return date ? { artist, album, date, name, url } : null;
+          if (date) {
+            const obj = { artist, album, name, url, date };
+            const uid = hash(obj);
+            return { uid, ...obj };
+          } else {
+            return null;
+          }
         });
 
         // Filter out "now playing" track if it exists
@@ -45,9 +51,6 @@ const getTracks = async () => {
         return null;
       }
     }
-
-    // Filter out tracks that were not played yesterday
-    tracks = tracks.filter((track) => wasYesterday(track.date));
 
     return tracks;
   } catch (error) {
