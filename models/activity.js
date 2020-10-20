@@ -7,7 +7,7 @@ const activitySchema = new mongoose.Schema({
   date: { type: Date, required: true },
   duration: { type: String, required: true },
   value: { type: String, required: true },
-  unit: { type: String, required: true },
+  unit: String,
 });
 
 activitySchema.plugin(uniqueValidator);
