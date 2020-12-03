@@ -3,6 +3,7 @@ const uniqueValidator = require("mongoose-unique-validator");
 
 const workoutSchema = new mongoose.Schema({
   uid: { type: String, required: true, unique: true },
+  stat: { type: String, required: true },
   calories: { type: Number, required: true },
   minutes: { type: Number, required: true },
   sets: { type: Number, required: true },

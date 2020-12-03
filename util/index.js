@@ -1,4 +1,6 @@
+const _ = require("lodash");
 const moment = require("moment");
+const { collection } = require("../models/book");
 
 const wasYesterday = (time) => {
   const day = moment().subtract(1, "days");
@@ -86,4 +88,24 @@ const formatActivities = (activities) => {
   return [...rest, ...formattedSleep];
 };
 
-module.exports = { wasYesterday, formatTime, setDateLimit, formatActivities };
+const groupByDateAndStat = (collection) => {
+  const getDate = (item) => moment(item.date).format("YYYY-MM-DD");
+  const group = _.groupBy(collection, getDate);
+
+  for (const key in group) {
+    if (group.hasOwnProperty(key)) {
+      const dateGroup = group[key];
+      group[key] = _.groupBy(dateGroup, "stat");
+    }
+  }
+
+  return group;
+};
+
+module.exports = {
+  wasYesterday,
+  formatTime,
+  setDateLimit,
+  formatActivities,
+  groupByDateAndStat,
+};

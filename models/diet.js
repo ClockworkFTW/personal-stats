@@ -3,6 +3,7 @@ const uniqueValidator = require("mongoose-unique-validator");
 
 const dietSchema = new mongoose.Schema({
   uid: { type: String, required: true, unique: true },
+  stat: { type: String, required: true },
   calories: { type: Number, required: true },
   carbs: { type: Number, required: true },
   fat: { type: Number, required: true },

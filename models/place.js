@@ -3,6 +3,7 @@ const uniqueValidator = require("mongoose-unique-validator");
 
 const placeSchema = new mongoose.Schema({
   uid: { type: String, unique: true },
+  stat: { type: String, required: true },
   name: String,
   lat: Number,
   lng: Number,

@@ -1,7 +1,11 @@
 const express = require("express");
 const router = express.Router();
 
-const { setDateLimit, formatActivities } = require("../util");
+const {
+  setDateLimit,
+  formatActivities,
+  groupByDateAndStat,
+} = require("../util");
 
 const Activity = require("../models/activity");
 const Book = require("../models/book");
@@ -33,6 +37,36 @@ router.get("/", async (req, res) => {
     if (types) {
       data = types.reduce((obj, key) => ({ ...obj, [key]: data[key] }), {});
     }
+
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(400).json({ error });
+  }
+});
+
+router.get("/calendar", async (req, res) => {
+  try {
+    const commits = await Commit.find({});
+    const books = await Book.find({});
+    const diet = await Diet.find({});
+    const places = await Place.find({});
+    const time = await Time.find({});
+    const todos = await Todo.find({});
+    const tracks = await Track.find({});
+    const workouts = await Workout.find({});
+
+    const collection = [
+      commits,
+      books,
+      diet,
+      places,
+      time,
+      todos,
+      tracks,
+      workouts,
+    ].flat();
+
+    const data = groupByDateAndStat(collection);
 
     res.status(200).json(data);
   } catch (error) {

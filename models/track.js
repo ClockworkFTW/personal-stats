@@ -3,6 +3,7 @@ const uniqueValidator = require("mongoose-unique-validator");
 
 const trackSchema = new mongoose.Schema({
   uid: { type: String, required: true, unique: true },
+  stat: { type: String, required: true },
   artist: { type: String, required: true },
   album: { type: String, required: true },
   name: { type: String, required: true },

@@ -3,6 +3,7 @@ const uniqueValidator = require("mongoose-unique-validator");
 
 const bookSchema = new mongoose.Schema({
   uid: { type: String, required: true, unique: true },
+  stat: { type: String, required: true },
   book_id: { type: String, required: true },
   title: { type: String, required: true },
   author: { type: String, required: true },
