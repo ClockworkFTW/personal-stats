@@ -1,37 +1,52 @@
 const express = require("express");
 const router = express.Router();
 
-const {
-  setDateLimit,
-  formatActivities,
-  groupByDateAndStat,
-} = require("../util");
+const { setDateLimit, groupByDateAndStat } = require("../util");
 
-const Activity = require("../models/activity");
 const Book = require("../models/book");
 const Commit = require("../models/commit");
 const Diet = require("../models/diet");
+const Heart = require("../models/heart");
 const Place = require("../models/place");
+const Step = require("../models/step");
 const Time = require("../models/time");
 const Todo = require("../models/todo");
 const Track = require("../models/track");
+const Weight = require("../models/weight");
 const Workout = require("../models/workout");
 
+// Return data by time frame and stat
 router.get("/", async (req, res) => {
   try {
-    let activities = await Activity.find(setDateLimit(req.query));
-    activities = formatActivities(activities);
-    const commits = await Commit.find(setDateLimit(req.query));
-    const books = await Book.find(setDateLimit(req.query));
-    const diet = await Diet.find(setDateLimit(req.query));
-    const places = await Place.find(setDateLimit(req.query));
-    const time = await Time.find(setDateLimit(req.query));
-    const todos = await Todo.find(setDateLimit(req.query));
-    const tracks = await Track.find(setDateLimit(req.query));
-    const workouts = await Workout.find(setDateLimit(req.query));
+    const { from, to } = req.query;
+    const dateLimit = setDateLimit(from, to);
 
-    // prettier-ignore
-    let data = { activities, books, commits, diet, places, time, todos, tracks, workouts }
+    const books = await Book.find(dateLimit);
+    const commits = await Commit.find(dateLimit);
+    const diet = await Diet.find(dateLimit);
+    const heart = await Heart.find(dateLimit);
+    const places = await Place.find(dateLimit);
+    const steps = await Step.find(dateLimit);
+    const time = await Time.find(dateLimit);
+    const todos = await Todo.find(dateLimit);
+    const tracks = await Track.find(dateLimit);
+    const weight = await Weight.find(dateLimit);
+    const workouts = await Workout.find(dateLimit);
+
+    let data = {
+      books,
+      commits,
+      diet,
+      heart,
+      places,
+      steps,
+      time,
+      todos,
+      tracks,
+      weight,
+      workouts,
+    };
+
     const types = req.query.type ? req.query.type.split(",") : null;
 
     if (types) {
@@ -44,25 +59,32 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Return data in calendar format
 router.get("/calendar", async (req, res) => {
   try {
-    const commits = await Commit.find({});
     const books = await Book.find({});
+    const commits = await Commit.find({});
     const diet = await Diet.find({});
+    const heart = await Heart.find({});
     const places = await Place.find({});
+    const steps = await Step.find({});
     const time = await Time.find({});
     const todos = await Todo.find({});
     const tracks = await Track.find({});
+    const weight = await Weight.find({});
     const workouts = await Workout.find({});
 
     const collection = [
-      commits,
       books,
+      commits,
       diet,
+      heart,
       places,
+      steps,
       time,
       todos,
       tracks,
+      weight,
       workouts,
     ].flat();
 

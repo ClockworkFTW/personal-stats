@@ -1,21 +1,57 @@
 const express = require("express");
 const router = express.Router();
+const _ = require("lodash");
+const moment = require("moment");
 const hash = require("object-hash");
 
-const Activity = require("../models/activity");
+const { durationAsSeconds } = require("../util");
+
+// prettier-ignore
+const models = {
+  heart: ["Resting Heart Rate", "Heart Rate Variability"],
+  diet: ["Active Calories", "Resting Calories", "Dietary Calories", "Protein", "Carbohydrates", "Total Fat", "Caffeine"],
+  steps: ["Steps", "Walking + Running Distance"],
+  weight: ["Weight", "Body Fat Percentage"],
+  sleep: ["Sleep"],
+};
 
 router.post("/", async (req, res) => {
   try {
-    const { data } = req.body;
+    for (const model in models) {
+      if (models.hasOwnProperty(model)) {
+        const types = models[model];
 
-    const activities = data.map((activity) => {
-      const date = new Date(activity.date);
-      const obj = { ...activity, date };
-      const uid = hash(obj);
-      return { uid, ...obj };
-    });
+        let data = req.body.data.filter(({ type }) => types.includes(type));
+        data = data.map((e) => ({
+          ...e,
+          date: moment(e.date).format("YYYY-MM-DD"),
+        }));
+        data = _.groupBy(data, "date");
 
-    await Activity.insertMany(activities, { ordered: false });
+        const group = [];
+
+        for (const date in data) {
+          const obj = { date };
+          if (data.hasOwnProperty(date)) {
+            data[date].forEach((e) => {
+              const { type, value, duration } = e;
+              if (type === "Sleep") {
+                const seconds = durationAsSeconds(duration);
+                obj.duration = obj.duration ? obj.duration + seconds : seconds;
+              } else {
+                const key = type.toLowerCase().split(" ").join("_");
+                obj[key] = Number(value).toFixed(1);
+              }
+            });
+          }
+          group.push({ ...obj, uid: hash(obj) });
+        }
+
+        // Save group to database
+        // await Model.insertMany(activities, { ordered: false });
+        console.log(group);
+      }
+    }
 
     res.status(200).send("SUCCESS");
   } catch (error) {

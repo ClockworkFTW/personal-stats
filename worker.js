@@ -5,7 +5,7 @@ const moment = require("moment");
 const { pending } = require("./config");
 
 // Import cron job tasks
-const mfp = require("./tasks/mfp");
+const workouts = require("./tasks/workouts");
 const todoist = require("./tasks/todoist");
 const rescuetime = require("./tasks/rescuetime");
 const foursquare = require("./tasks/foursquare");
@@ -23,7 +23,7 @@ const tasks = async () => {
     pending("TASKS STARTED:", moment().format("h:mm:ssA YYYY-MM-DD"))
   );
 
-  await mfp();
+  await workouts();
   await todoist();
   await rescuetime();
   await foursquare();

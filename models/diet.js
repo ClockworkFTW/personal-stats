@@ -3,16 +3,15 @@ const uniqueValidator = require("mongoose-unique-validator");
 
 const dietSchema = new mongoose.Schema({
   uid: { type: String, required: true, unique: true },
+  date: { type: String, required: true },
   stat: { type: String, required: true },
-  calories: { type: Number, required: true },
-  carbs: { type: Number, required: true },
-  fat: { type: Number, required: true },
-  protein: { type: Number, required: true },
-  cholesterol: { type: Number, required: true },
-  sodium: { type: Number, required: true },
-  sugar: { type: Number, required: true },
-  fiber: { type: Number, required: true },
-  date: { type: Date, required: true },
+  active_calories: { type: String, required: true },
+  resting_calories: { type: String, required: true },
+  dietary_calories: { type: String, required: true },
+  protein: { type: String, required: true },
+  carbohydrates: { type: String, required: true },
+  total_fat: { type: String, required: true },
+  caffeine: { type: String, required: true },
 });
 
 dietSchema.plugin(uniqueValidator);

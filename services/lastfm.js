@@ -1,7 +1,4 @@
 const axios = require("axios");
-const pify = require("pify");
-const { parseString } = require("xml2js");
-const hash = require("object-hash");
 
 const cors = process.env.CORS_PROXY;
 const base_url = "http://ws.audioscrobbler.com/2.0/";
@@ -21,35 +18,7 @@ const getTracks = async () => {
     // Fetch the last 1000 played tracks
     for (let page = 1; page <= 5; page++) {
       let result = await axios.get(`${url}&page=${page}`, config);
-
-      // Convert XML to JSON
-      result = await pify(parseString)(result.data);
-
-      if (result.lfm.$.status === "ok") {
-        // Format JSON
-        result = result.lfm.recenttracks[0].track.map((track) => {
-          const artist = track.artist[0]._;
-          const album = track.album[0]._;
-          const name = track.name[0];
-          const url = track.url[0];
-          const date = track.date ? new Date(track.date[0].$.uts * 1000) : null;
-          if (date) {
-            const obj = { artist, album, name, url, date };
-            const uid = hash(obj);
-            return { uid, ...obj };
-          } else {
-            return null;
-          }
-        });
-
-        // Filter out "now playing" track if it exists
-        result = result.filter((track) => track);
-
-        // Append formatted result array to tracks array
-        tracks = [...tracks, ...result];
-      } else {
-        return null;
-      }
+      tracks = [...tracks, result.data];
     }
 
     return tracks;

@@ -3,8 +3,6 @@ const hash = require("object-hash");
 
 const cors = process.env.CORS_PROXY;
 const base_url = "https://api.github.com";
-const client_id = process.env.GITHUB_CLIENT_ID;
-const client_secret = process.env.GITHUB_CLIENT_SECRET;
 
 const config = { headers: { Origin: "x-requested-with" } };
 
@@ -16,21 +14,11 @@ const getEvents = async () => {
 
     let events = [];
 
-    // Fetch last 500 events
+    // Fetch last 300 events
     for (let i = 1; i <= 3; i++) {
       const result = await axios.get(`${url}&page=${i}`, config);
       events = [...events, ...result.data];
     }
-
-    // Format events
-    events = events.map((event) => {
-      const { type } = event;
-      const repo = event.repo.name.split("/")[1];
-      const date = new Date(event.created_at);
-      const obj = { type, repo, date };
-      const uid = hash(obj);
-      return { uid, ...obj };
-    });
 
     return events;
   } catch (error) {

@@ -3,6 +3,7 @@ const uniqueValidator = require("mongoose-unique-validator");
 
 const timeSchema = new mongoose.Schema({
   uid: { type: String, required: true, unique: true },
+  date: { type: String, required: true },
   stat: { type: String, required: true },
   total_time: { type: String, required: true },
   all_productive_time: { type: String, required: true },
@@ -21,7 +22,6 @@ const timeSchema = new mongoose.Schema({
   reference_and_learning_time: { type: String, required: true },
   shopping_time: { type: String, required: true },
   utilities_time: { type: String, required: true },
-  date: { type: Date, required: true },
 });
 
 timeSchema.plugin(uniqueValidator);

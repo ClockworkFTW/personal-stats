@@ -2,14 +2,14 @@ const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 
 const placeSchema = new mongoose.Schema({
-  uid: { type: String, unique: true },
+  uid: { type: String, required: true, unique: true },
+  date: { type: String, required: true },
   stat: { type: String, required: true },
   name: String,
   lat: Number,
   lng: Number,
   address: String,
   categories: [String],
-  date: Date,
 });
 
 placeSchema.plugin(uniqueValidator);
