@@ -3,7 +3,7 @@ const pify = require("pify");
 const { parseString } = require("xml2js");
 
 const { pass, fail } = require("../config");
-const { formatTime, formatDate } = require("../util");
+const { formatGoodreadsTime, formatDate } = require("../util");
 const goodreads = require("../services/goodreads");
 const Book = require("../models/book");
 
@@ -43,10 +43,10 @@ module.exports = async () => {
               if (e.status[0] === "currently-reading") {
                 cur_page = "0";
                 cur_percent = "0";
-                time = formatTime(e.updated_at[0]._);
+                time = formatGoodreadsTime(e.updated_at[0]._);
               } else {
                 cur_percent = "100";
-                time = formatTime(e.updated_at[0]._);
+                time = formatGoodreadsTime(e.updated_at[0]._);
               }
               return { cur_page, cur_percent, time };
             }
@@ -62,7 +62,7 @@ module.exports = async () => {
           user_statuses = progress.user_statuses[0].user_status.map((e) => {
             const cur_page = e.page[0]._;
             const cur_percent = e.percent[0]._;
-            const time = formatTime(e.created_at[0]._);
+            const time = formatGoodreadsTime(e.created_at[0]._);
 
             return { cur_page, cur_percent, time };
           });
@@ -91,10 +91,8 @@ module.exports = async () => {
       })
     );
 
-    console.log(books);
-
-    // // Save data
-    // await Book.insertMany(books.flat(), { ordered: false });
+    // Save data
+    await Book.insertMany(books.flat(), { ordered: false });
 
     console.log(pass("PASSED - GOODREADS"));
   } catch (error) {

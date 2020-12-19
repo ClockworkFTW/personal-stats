@@ -17,9 +17,13 @@ dbConnect(worker);
 const applehealth = require("./routes/applehealth");
 app.use("/api/apple-health", applehealth);
 
-// Return data
-const data = require("./routes/data");
-app.use("/api/data", data);
+// Return statistics data
+const statistics = require("./routes/statistics");
+app.use("/api/statistics", statistics);
+
+// Return portfolio data
+const portfolio = require("./routes/portfolio");
+app.use("/api/portfolio", portfolio);
 
 app.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`);

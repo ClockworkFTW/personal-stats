@@ -15,8 +15,18 @@ module.exports = async () => {
       categories = categories.map((category) => category.name);
       const address = location.formattedAddress.join(", ");
       const { lat, lng } = location;
-      const date = formatDate(checkin.createdAt * 1000);
-      const obj = { date, name, lat, lng, address, categories, stat: "place" };
+      const time = new Date(checkin.createdAt * 1000);
+      const date = formatDate(time);
+      const obj = {
+        time,
+        date,
+        name,
+        lat,
+        lng,
+        address,
+        categories,
+        stat: "place",
+      };
       const uid = hash(obj);
       return { uid, ...obj };
     });

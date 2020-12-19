@@ -1,40 +1,44 @@
 const express = require("express");
 const router = express.Router();
 const _ = require("lodash");
-const moment = require("moment");
 const hash = require("object-hash");
 
-const { durationAsSeconds } = require("../util");
+const Diet = require("../models/diet");
+const Heart = require("../models/heart");
+const Sleep = require("../models/sleep");
+const Step = require("../models/step");
+const Weight = require("../models/weight");
+
+const { formatDate, durationAsSeconds } = require("../util");
 
 // prettier-ignore
-const models = {
-  heart: ["Resting Heart Rate", "Heart Rate Variability"],
-  diet: ["Active Calories", "Resting Calories", "Dietary Calories", "Protein", "Carbohydrates", "Total Fat", "Caffeine"],
-  steps: ["Steps", "Walking + Running Distance"],
-  weight: ["Weight", "Body Fat Percentage"],
-  sleep: ["Sleep"],
+const stats = {
+  heart: {types: ["Resting Heart Rate", "Heart Rate Variability"], model: Heart},
+  diet: {types: ["Active Calories", "Resting Calories", "Dietary Calories", "Protein", "Carbohydrates", "Total Fat", "Caffeine"], model: Diet},
+  sleep: {types: ["Sleep"], model: Sleep},
+  steps: {types: ["Steps", "Walking + Running Distance"], model: Step},
+  weight: {types: ["Weight", "Body Fat Percentage"], model: Weight},
 };
 
 router.post("/", async (req, res) => {
   try {
-    for (const model in models) {
-      if (models.hasOwnProperty(model)) {
-        const types = models[model];
+    for (const stat in stats) {
+      if (stats.hasOwnProperty(stat)) {
+        const { types, model } = stats[stat];
 
-        let data = req.body.data.filter(({ type }) => types.includes(type));
-        data = data.map((e) => ({
-          ...e,
-          date: moment(e.date).format("YYYY-MM-DD"),
-        }));
+        // Get data from request body and group by date
+        let { data } = req.body;
+        data = data.filter(({ type }) => types.includes(type));
+        data = data.map((e) => ({ ...e, date: formatDate(e.time) }));
         data = _.groupBy(data, "date");
 
+        // Format date groupings into stat groupings
         const group = [];
-
         for (const date in data) {
-          const obj = { date };
           if (data.hasOwnProperty(date)) {
+            let obj = { date, stat };
             data[date].forEach((e) => {
-              const { type, value, duration } = e;
+              const { type, value, duration, time } = e;
               if (type === "Sleep") {
                 const seconds = durationAsSeconds(duration);
                 obj.duration = obj.duration ? obj.duration + seconds : seconds;
@@ -43,13 +47,12 @@ router.post("/", async (req, res) => {
                 obj[key] = Number(value).toFixed(1);
               }
             });
+            group.push({ ...obj, uid: hash(obj) });
           }
-          group.push({ ...obj, uid: hash(obj) });
         }
 
-        // Save group to database
-        // await Model.insertMany(activities, { ordered: false });
-        console.log(group);
+        // Save groupings to database
+        await model.insertMany(group, { ordered: false });
       }
     }
 

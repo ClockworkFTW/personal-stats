@@ -4,9 +4,9 @@ const cors = process.env.CORS_PROXY;
 
 const config = { headers: { Origin: "x-requested-with" } };
 
-const getData = async (id) => {
+const getData = async (id, tab) => {
   try {
-    const endpoint = `https://spreadsheets.google.com/feeds/cells/${id}/1/public/full?alt=json`;
+    const endpoint = `https://spreadsheets.google.com/feeds/cells/${id}/${tab}/public/full?alt=json`;
     const url = `${cors}/${endpoint}`;
 
     const result = await axios.get(url, config);

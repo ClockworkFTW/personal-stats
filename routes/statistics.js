@@ -8,6 +8,7 @@ const Commit = require("../models/commit");
 const Diet = require("../models/diet");
 const Heart = require("../models/heart");
 const Place = require("../models/place");
+const Sleep = require("../models/sleep");
 const Step = require("../models/step");
 const Time = require("../models/time");
 const Todo = require("../models/todo");
@@ -26,6 +27,7 @@ router.get("/", async (req, res) => {
     const diet = await Diet.find(dateLimit);
     const heart = await Heart.find(dateLimit);
     const places = await Place.find(dateLimit);
+    const sleep = await Sleep.find(dateLimit);
     const steps = await Step.find(dateLimit);
     const time = await Time.find(dateLimit);
     const todos = await Todo.find(dateLimit);
@@ -39,6 +41,7 @@ router.get("/", async (req, res) => {
       diet,
       heart,
       places,
+      sleep,
       steps,
       time,
       todos,
@@ -67,6 +70,7 @@ router.get("/calendar", async (req, res) => {
     const diet = await Diet.find({});
     const heart = await Heart.find({});
     const places = await Place.find({});
+    const sleep = await Sleep.find({});
     const steps = await Step.find({});
     const time = await Time.find({});
     const todos = await Todo.find({});
@@ -80,6 +84,7 @@ router.get("/calendar", async (req, res) => {
       diet,
       heart,
       places,
+      sleep,
       steps,
       time,
       todos,
