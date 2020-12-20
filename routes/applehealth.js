@@ -22,6 +22,7 @@ const stats = {
 
 router.post("/", async (req, res) => {
   try {
+    let count = [];
     for (const stat in stats) {
       if (stats.hasOwnProperty(stat)) {
         const { types, model } = stats[stat];
@@ -29,7 +30,7 @@ router.post("/", async (req, res) => {
         // Get data from request body and group by date
         let { data } = req.body;
         data = data.filter(({ type }) => types.includes(type));
-        data = data.map((e) => ({ ...e, date: formatDate(e.time) }));
+        data = data.map((e) => ({ ...e, date: formatDate(new Date(e.time)) }));
         data = _.groupBy(data, "date");
 
         // Format date groupings into stat groupings
@@ -53,10 +54,12 @@ router.post("/", async (req, res) => {
 
         // Save groupings to database
         await model.insertMany(group, { ordered: false });
+        count.push(group);
       }
     }
 
-    res.status(200).send("SUCCESS");
+    count = count.flat().length;
+    res.status(200).send(`SUCCESS: ${count}`);
   } catch (error) {
     console.log(error);
     res.status(400).send("ERROR");
